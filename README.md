@@ -28,7 +28,7 @@ LPatternMatch.Core.pas natively supports Unicode (UTF-16, native format of unico
 Just to say - normal Unicode support was one of the main reasons LPatternMatch was made, as I got tired of tries to get regex engine work with unicode normally (I mean, it may be not the fault of library itself but the effect of `it does not work on my machine`, but I needed this with Unicode so I made engine with Unicode support).
 
 Unicode is turned on by default, I suppose it might decrease speed of execution when working with non-Unicode data.
-If you do not need Unicode support - just comment out the directive `{$Define UNICODE}` in the LPatternMatch.pas
+If you do not need Unicode support - just comment out the directive `{$Define UNICODE}` in the LPatternMatch.Core.pas
 
 # Delphi compatibility
 
