@@ -134,6 +134,14 @@ end.
 `LPatternMatch.pas` file contains interactive demo using this code (you can input source string and pattern from keyboard and to see the result of execution)
 `input.txt` contains Unicode test cases (in case you cannot input unicode data from cmd). So to use this file you would want to start application like `LPatternMatch.exe <input.txt`
 
+Please notice that this repo is created when I just created making simple examples, so the code is not properly documented; It will fixed in next releases
+
+# Possible usage in other language
+
+Although all the processing is done using Object Pascal, it is easily possible to turn LPatternMatch into library with C interface (so it means universal), as the code does not use any Object Pascal bound data types and mechanisms.
+
+Native cdecl functions will be presented a bit later, when code will be better documented and maintained.
+
 # Reference
 
 Original code is not made by me; It is all done by Lua Team.
