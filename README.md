@@ -17,6 +17,7 @@ But there are also problematic sides of pattern matching approach:
 
 # WARNINGS
 This unit is not properly tested. Whilst it *should* work as original unit (lstrlib.c) does, I cannot guarantee that I have not missed something or made any error.
+
 So basically, you may use this engine, but if you find an error - please report it, so I can see if I really missed something.
 
 Also this project lacks testing suites or something like that, so I can judge that unit works only by limited amount of testing cases
@@ -28,6 +29,7 @@ LPatternMatch.Core.pas natively supports Unicode (UTF-16, native format of unico
 Just to say - normal Unicode support was one of the main reasons LPatternMatch was made, as I got tired of tries to get regex engine work with unicode normally (I mean, it may be not the fault of library itself but the effect of `it does not work on my machine`, but I needed this with Unicode so I made engine with Unicode support).
 
 Unicode is turned on by default, I suppose it might decrease speed of execution when working with non-Unicode data.
+
 If you do not need Unicode support - just comment out the directive `{$Define UNICODE}` in the LPatternMatch.Core.pas
 
 # Delphi compatibility
@@ -40,6 +42,7 @@ Code looks like normal Object Pascal source without any dependence on Delphi/FPC
 Only brief explanation will be put here. For full pattern syntax specification please read [original article from PIL](https://www.lua.org/pil/20.2.html)
 
 Escape charater is `%` by default, however it can be changed in the LPatternMatch.pas (it is constant `LPM_L_ESC`).
+
 There is a set of special symbols that mean special things in the patterns (`( ) . % + - * ? [ ^ $`); If they are going to be used in the pattern by their actual value - they must be escaped (prefixed with an escape character).
 
 - Groups are defined by `( )` brackets in the pattern string
@@ -71,6 +74,7 @@ So for example `%d+` will try to match as many digits as possible but at least o
 # How to compile LPatternMatch on FPC
 
 You may just use `ppcx64 LPatternMatch.pas` (replace `ppcx64` with any other name of compiler on other platforms) if it is in your PATH (on windows).
+
 LPatternMatch can also be compiled using Lazarus (if you do not have compiler in your path or just do not prefer using cmd compilation).
 
 # Brief docs on how to use
@@ -132,6 +136,7 @@ end.
 ```
 
 `LPatternMatch.pas` file contains interactive demo using this code (you can input source string and pattern from keyboard and to see the result of execution)
+
 `input.txt` contains Unicode test cases (in case you cannot input unicode data from cmd). So to use this file you would want to start application like `LPatternMatch.exe <input.txt`
 
 Please notice that this repo is created when I just created making simple examples, so the code is not properly documented; It will fixed in next releases
@@ -149,10 +154,12 @@ Original code is not made by me; It is all done by Lua Team.
 Lua is great scripting programming language I have been used for years, and when I thought about light and simple pattern matching engine I just remembered this wonderful language.
 
 Official website: [Lua](https://www.lua.org)
+
 Logo of language (I could not remember how to place images into mardown): [Logo](http://www.andreas-rozek.de/Lua/Lua-Logo_64x64.png "Lua logo")
 
 # Contancts
 
 If you find a bug - please consider opening issue on github.
+
 If you want to contact me - you may use email (hunter200165@gmail.com), or discord (HFSoftware server, link is in my profile)
 
