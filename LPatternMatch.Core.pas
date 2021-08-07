@@ -59,63 +59,122 @@ const LPM_CAP_POSITION = -2;
 const LPM_MAX_CAPTURES = 64;
 
 const LPM_L_ESC = '%';
-const LPM_SPECIALS = [ '^', '$', '*', '+', '?', '.', '(', '[', '%', '-' ];
+{ Better - we include L_ESC in special set directly }
+const LPM_SPECIALS = [ '^', '$', '*', '+', '?', '.', '(', '[', '-', LPM_L_ESC ];
 
+{ Max depth of recursion in call to Match method }
 const LPM_MAX_CALLS = 256;
 
 type 
 	TLPMResult = Int32;
 
-const 
+const
+	{ Defines normal result }
 	LPM_RESULT_OK = 0;
+	{ Errors that might happen in Match function }
 	LPM_RESULT_PATTERN_IS_TOO_COMPLEX = 10;
 	LPM_RESULT_PATTERN_EXPECTED_SQUARE_BRACKET_AFTER_FRONTIER = 11;
+	{ Errors that might happen in StartCaputre function }
 	LPM_RESULT_TOO_MANY_CAPTURES = 20;
+	{ Errors that might happen in CheckCapture function }
 	LPM_RESULT_INVALID_CAPTURE_INDEX = 30;
+	{ Errors that might happen in CaptureToClose function }
 	LPM_RESULT_INVALID_PATTERN_CAPTURE = 40;
+	{ Errors that might happen in MatchBalance function }
 	LPM_RESULT_MISSING_ARGUMENTS_FOR_BALANCE = 50;
+	{ Errors that might happen in ClassEnd function }
 	LPM_RESULT_CLASS_END_ENDS_WITH_ESCAPE_CHAR = 60;
 	LPM_RESULT_CLASS_DOES_NOT_END_WITH_SQUARE_BRACKET = 61;
 
 type
+	{ Record representing one particular capture }
 	TLPMCapture = packed record
 		Init: PLPMChar;
+		{ Added position }
+		Position: Int32;
 		Length: Int32;
 	end;
+	{ Static array of  }
 	TLPMCaptures = array [0..(LPM_MAX_CAPTURES - 1)] of TLPMCapture;
 
 type
 	{ TLPMMatchState }
-	TLPMMatchState = record
+	TLPMMatchState = packed record
+	public var
+		{ Begin of source string }
 		SrcInit: PLPMChar;
+		{ End of source string (usually \0 character, but may be any) }
 		SrcEnd: PLPMChar;
+		{ End of pattern string (usually \0 character, but may be any) }
 		PEnd: PLPMChar;
+	private var
+		{ Shows recursion depth of match function }
 		MatchDepth: Int32;
+	public var
+		{ Captures count }
 		Level: Int32;
+		{ Captures themselves }
 		Captures: TLPMCaptures;
 	public
+		{ Does pattern contain special symbols? }
 		class function NoSpecials(P: PLPMChar; L: Int32): Boolean; static;
+		{ Find position of S2 in S1 and return the entry (pointer) or nil, if nothing is found.
+			The reason that it exists here - it is that Pos function does not work with pointers (PChars), so I implemented one that was in lstrlib.c
+		}
 		class function LMemFind(S1, S2: PLPMChar; L1, L2: Int32): PLPMChar; static;
-	public
+	private
+		{ Check that capture is valid }
 		function CheckCatpure(L: Int32; out Res: Int32): TLPMResult;
+		{ Return the latest capture that pends closing }
 		function CaptureToClose(out Res: Int32): TLPMResult;
-	public
+	private
+		{ Return pointer to the next character after end of class }
 		function ClassEnd(P: PLPMChar; out Res: PLPMChar): TLPMResult;
-	public
+	private
+		{ Match balancing (%bxy form in pattern) }
 		function MatchBalance(S: PLPMChar; P: PLPMChar; out Res: PLPMChar): TLPMResult;
+		{ Match special character class (%d, %a, %h etc) }
 		function MatchClass(C, CL: TLPMChar): Boolean;
+		{ Match character class ([abc], [^a-Z] etc) }
 		function MatchBracketClass(C: TLPMChar; P: PLPMChar; EC: PLPMChar): Boolean;
+		{ Match capture ((), (abc+) etc) }
 		function MatchCapture(S: PLPMChar; L: Int32; out Res: PLPMChar): TLPMResult;
+		{ Does match single char using current pattern? }
 		function SingleMatch(S: PLPMChar; P: PLPMChar; EP: PLPMChar): Boolean;
+		{ Tries to find as much characters matching pattern as it can to match the pattern }
 		function MaxExpand(S: PLPMChar; P: PLPMChar; EP: PLPMChar; out Res: PLPMChar): TLPMResult;
+		{ Tries to find as least characters matching pattern as it can to match the pattern }
 		function MinExpand(S: PLPMChar; P: PLPMChar; EP: PLPMChar; out Res: PLPMChar): TLPMResult;
-	public
+	private
+		{ Starts new capture with specified index (just note - What is Index + Ord('1'), just because it is used with characters in the match function) }
 		function StartCapture(S: PLPMChar; P: PLPMChar; What: Int32; out Res: PLPMChar): TLPMResult;
+		{ Ends last capture, defining its length and position }
 		function EndCapture(S: PLPMChar; P: PLPMChar; out Res: PLPMChar): TLPMResult;
+	private
+		{ Main function used to match pattern in input string
+			Requires attuned record (Nullify + SrcInit + SrcEnd + PEnd), so better use Find method
+		}
 		function Match(S: PLPMChar; P: PLPMChar; out Res: PLPMChar): TLPMResult;
 	public
-		function Find(SourceStr: PLPMChar; PatternStr: PLPMChar; SourceStrLength: Int32; PatternStrLength: Int32; PosToStart: Int32; out Res: PLPMChar): TLPMResult;
+		{ Wrapper around Match method, that will do most of dirty work for you
+			SourceStr - pointer to first char in source string
+			PatternStr - pointer to first char in pattern string
+			SourceStrLength - length of source string IN CHARS, NOT IN BYTES
+			PatternStrLength - length of pattern string IN CHARS, NOT IN BYTES
+			PosToStart - where function must start from; it is 0-based!!!
+			out Res - output is pointer to first char where pattern was found or nil, if pattern was not found
+		}
+		function Find(SourceStr: PLPMChar; PatternStr: PLPMChar; SourceStrLength: Int32; PatternStrLength: Int32; PosToStart: Int32; out Res: PLPMChar): TLPMResult; overload;
+		{ Object pascal proxy method
+			SourceStr - first string
+			PatternStr - second string
+			PosToStart - position to start from (it is 1-based!!!)
+		}
+		function Find(SourceStr, PatternStr: TLPMString; PosToStart: Int32): TLPMResult; overload;
 	public
+		function GetCaptureContent(const Index: Int32): TLPMString;
+	private
+		{ Method to clear internal structure and nullify all the record fields }
 		procedure Nullify;
 	end;
 
@@ -299,7 +358,7 @@ begin
 		'd', 'D': Result := (CL = 'D') xor (C in ['0'..'9']);
 		'g', 'G': Result := (CL = 'G') xor not (C <= ' ');
 		'l', 'L': Result := (CL = 'L') xor ((C >= 'a') and (C <= 'z'));
-		'p', 'P': Result := (CL = 'P') xor ((C >= '!') and (C < '0'));
+		'p', 'P': Result := (CL = 'P') xor (((C >= '!') and (C < '0')) or ((C > '9') and (C < 'A')) or ((C > 'Z') and (C < 'a')) or ((C > 'z') and (C < #128)));
 		's', 'S': Result := (CL = 'S') xor (C <= ' ');
 		'u', 'U': Result := (CL = 'U') xor ((C >= 'A') and (C <= 'Z'));
 		'w', 'W': Result := (CL = 'W') xor ((C in ['0'..'9']) or (((C >= 'a') and (C <= 'z')) or ((C >= 'A') and (C <= 'Z'))));
@@ -485,6 +544,9 @@ begin
 		Exit;
 	end;
 
+	{ Infinite loop (well, there are no flow paths that makes it infinite) is used to be able to Continue the execution,
+		It works the same as goto would work, but it is prettier and procedural than goto approach is
+	}
 	while not False do begin
 		if P = PEnd then
 			Break;
@@ -641,12 +703,13 @@ end;
 function TLPMMatchState.Find(SourceStr: PLPMChar; PatternStr: PLPMChar; SourceStrLength: Int32; PatternStrLength: Int32; PosToStart: Int32; out Res: PLPMChar): TLPMResult;
 var Ps: PLPMChar;
 	Anchor: Boolean;
+	i: Integer;
 begin
 	Result := LPM_RESULT_OK;
 	Res := nil;
 
 	Nullify;
-	if PosToStart >= SourceStrLength then
+	if (PosToStart >= SourceStrLength) or (PosToStart < 0) then
 		Exit;
 	if NoSpecials(PatternStr, PatternStrLength) then begin
 		{ No special symbols found, using simple Pos }
@@ -684,6 +747,30 @@ begin
 			Break;
 		Ps := Ps + 1;
 	until (Ps >= SrcEnd) or Anchor;
+
+	for i := 0 to Level - 1 do
+		Captures[i].Position := Captures[i].Init - SourceStr;
+end;
+
+function TLPMMatchState.Find(SourceStr, PatternStr: TLPMString; PosToStart: Int32): TLPMResult;
+var DummyRes: PLPMChar;
+	i: Integer;
+begin
+	Result := Find(PLPMChar(Pointer(SourceStr)), PLPMChar(Pointer(PatternStr)), Length(SourceStr), Length(PatternStr), PosToStart - 1, DummyRes);
+	if LongBool(Result) then
+		Exit;
+	for i := 0 to Level - 1 do
+		{ Because positions in pascal strings are 1-based }
+		Inc(Captures[i].Position);
+end;
+
+function TLPMMatchState.GetCaptureContent(const Index: Int32): TLPMString;
+begin
+	Result := '';
+	if (Index >= 0) and (Index < Level) and (Captures[Index].Length > 0) then begin
+		SetLength(Result, Captures[Index].Length);
+		Move(Captures[Index].Init^, Result[1], Captures[Index].Length * SizeOf(TLPMChar));
+	end;
 end;
 
 procedure TLPMMatchState.Nullify;
