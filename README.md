@@ -6,7 +6,7 @@ Name LPatternMatch means Lua Pattern Match, which is what it really is - transla
 # Why use (and why don't use) *this* instead of regex engines
 
 While regex (regular expression) engines are much more powerful than pattern matching engine, using latter gives you those pros:
-- The code of pattern matching engine is *much more* simpler and compact, it means that usually footprint of this enigne will be really small (190kB on Win64 using unicode strings);
+- The code of pattern matching engine is *much more* simpler and compact, it means that usually footprint of this enigne will be really small (190kB on Win64 using unicode strings/56kB on Win64 using non-Unicode strings with static ranges);
 - Pattern match is usually enough for tasks where regex is used, for example - URLs parsing, mask matching and so on. If you do not use complicated features from regex libraries - you might want to use simple pattern matching engine to avoid unnecessary size overhead;
 - Only one unit with no external dependencies;
 - Suitable if input data is not very big or patters are not extremely complex.
@@ -30,7 +30,7 @@ Just to say - normal Unicode support was one of the main reasons LPatternMatch w
 
 Unicode is turned on by default, I suppose it might decrease speed of execution when working with non-Unicode data.
 
-If you do not need Unicode support - just comment out the directive `{$Define UNICODE}` in the LPatternMatch.Core.pas
+If you do not need Unicode support - just comment out the directive `{$Define UNICODE}` in the LPatternMatch.Core.pas. Also, if you need only English language characters (so basically only first 127 symbols of ASCII table) - you might want to turn on static ranges comparison (uncomment directive `{$Define StaticRanges}` in LPatternMatch.Core.pas), which decreases size of exe dramatically (mostly because of Character unit).
 
 # Delphi compatibility
 
