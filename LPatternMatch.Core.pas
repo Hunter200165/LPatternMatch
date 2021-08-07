@@ -717,6 +717,7 @@ begin
 		if not (Ps = nil) then begin
 			{ Using captures }
 			Captures[0].Init := Ps;
+			Captures[0].Position := Ps - SourceStr;
 			Captures[0].Length := PatternStrLength;
 			Level := Level + 1;
 			Res := Ps;
