@@ -66,6 +66,7 @@ There are also special character classes, which may be used to make patterns sho
 - `%w` matches alphanumeric character (any letter or digit or underscope (`_`))
 - `%x` matches hexadecimal digit (0123456789abcdefABCDEF)
 - `%z` matches null character (0)
+
 Special character class may be inverted by placing uppercase letter instead of lowercase (for example, `%D` will match anything but digit).
 
 And also there are suffixes:
@@ -73,6 +74,7 @@ And also there are suffixes:
 - `*` matches 0 or more repetitions of given class (greedy)
 - `-` matches 0 or more repetitions of given class (non-greedy)
 - `?` matches either 0 or 1 repetitions of given class
+
 So for example `%d+` will try to match as many digits as possible but at least one.
 
 # How to compile LPatternMatch on FPC
