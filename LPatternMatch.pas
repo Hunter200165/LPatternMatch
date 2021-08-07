@@ -6,13 +6,12 @@ program LPatternMatch;
 uses LPatternMatch.Core;
 
 var LPM: TLPMMatchState;
-	A, B: UnicodeString;
-	Res: PLPMChar;
-	Status: TLPMResult;
-	i, k: Integer;
+    A, B: UnicodeString;
+    Status: TLPMResult;
+    i: Integer;
 begin
-	while not False do begin
-		Write('Input A: ');
+    while not False do begin
+		Write('Input string : ');
 		ReadLn(A);
 		Write('Input pattern: ');
 		ReadLn(B);
@@ -20,7 +19,8 @@ begin
 			WriteLn('Either A or B is empty - exiting');
 			Exit;
 		end;
-		Status := LPM.Find(@A[1], @B[1], Length(A), Length(B), 0, Res);
+		// Status := LPM.Find(@A[1], @B[1], Length(A), Length(B), 0, Res);
+		Status := LPM.Find(A, B, 1);
 		if LongBool(Status) then begin
 			WriteLn('Finished with error status = ', Status);
 		end
@@ -30,12 +30,9 @@ begin
 			else begin
 				for i := 0 to LPM.Level - 1 do begin
 					WriteLn('Capture #', i, ': ');
-					WriteLn('	Starts : ', LPM.Captures[i].Init - PLPMChar(@A[1]));
+					WriteLn('	Starts : ', LPM.Captures[i].Position);
 					WriteLn('	Length : ', LPM.Captures[i].Length);
-					Write('	Content: ');
-					for k := 0 to LPM.Captures[i].Length - 1 do
-						Write(LPM.Captures[i].Init[k]);
-					WriteLn;
+					WriteLn('	Content: ', LPM.GetCaptureContent(i));
 				end;
 			end;
 		end;
