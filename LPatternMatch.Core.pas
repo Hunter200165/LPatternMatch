@@ -37,9 +37,14 @@ unit LPatternMatch.Core;
 interface
 
 {$Define Unicode}
+{$IfNDef Unicode}
+	{.$Define UseStaticRanges}
+{$Else}
+	{$UnDef UseStaticRanges}
+{$EndIf}
 
-{$IfDef Unicode}
 type
+{$IfDef Unicode}
 	TLPMString = UnicodeString;
 	TLPMChar = UnicodeChar;
 {$Else}
@@ -118,8 +123,10 @@ type
 
 implementation
 
+{$IfNDef UseStaticRanges}
 uses
 	Character;
+{$EndIf}
 
 { TLPMMatchState }
 
@@ -269,6 +276,7 @@ end;
 
 function TLPMMatchState.MatchClass(C, CL: TLPMChar): Boolean;
 begin
+	{$IfNDef UseStaticRanges}
 	case CL of
 		'a', 'A': Result := (CL = 'A') xor IsLetter(UnicodeChar(C));
 		'c', 'C': Result := (CL = 'C') xor IsControl(UnicodeChar(C));
@@ -284,6 +292,23 @@ begin
 	else
 		Result := CL = C;
 	end;
+	{$Else}
+	case CL of
+		'a', 'A': Result := (CL = 'A') xor (((C >= 'a') and (C <= 'z') or ((C >= 'A') or (C <= 'Z'))));
+		'c', 'C': Result := (CL = 'C') xor (C < ' ');
+		'd', 'D': Result := (CL = 'D') xor (C in ['0'..'9']);
+		'g', 'G': Result := (CL = 'G') xor not (C <= ' ');
+		'l', 'L': Result := (CL = 'L') xor ((C >= 'a') and (C <= 'z'));
+		'p', 'P': Result := (CL = 'P') xor ((C >= '!') and (C < '0'));
+		's', 'S': Result := (CL = 'S') xor (C <= ' ');
+		'u', 'U': Result := (CL = 'U') xor ((C >= 'A') and (C <= 'Z'));
+		'w', 'W': Result := (CL = 'W') xor ((C in ['0'..'9']) or (((C >= 'a') and (C <= 'z')) or ((C >= 'A') and (C <= 'Z'))));
+		'x', 'X': Result := (CL = 'X') xor (C in ['0'..'9', 'a'..'f', 'A'..'F']);
+		'z', 'Z': Result := (CL = 'Z') xor (C = #0);
+	else
+		Result := CL = C;
+	end;
+	{$EndIf}
 end;
 
 function TLPMMatchState.MatchBracketClass(C: TLPMChar; P: PLPMChar; EC: PLPMChar): Boolean;
