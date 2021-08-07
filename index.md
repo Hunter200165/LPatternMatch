@@ -161,4 +161,4 @@ Logo of language: ![Logo](http://www.andreas-rozek.de/Lua/Lua-Logo_64x64.png "Lu
 
 If you find a bug - please consider opening issue on github.
 
-If you want to contact me - you may use email (hunter200165@gmail.com), or discord (HFSoftware server, link is in my profile)
+If you want to contact me - you may use email (hunter200165@gmail.com), or discord (HFSoftware server, link is in my profile) 
