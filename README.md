@@ -167,5 +167,7 @@ Logo of language (I could not remember how to place images into mardown): [Logo]
 
 If you find a bug - please consider opening issue on github.
 
+If you have a question - you may also open a discussion on github (it is lighter version of issues, so you can just ask your questions here) in real time, as chat.
+
 If you want to contact me - you may use email (hunter200165@gmail.com), or discord (HFSoftware server, link is in my profile)
 
