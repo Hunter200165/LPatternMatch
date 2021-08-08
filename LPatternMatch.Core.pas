@@ -242,7 +242,7 @@ end;
 
 function TLPMMatchState.CheckCatpure(L: Int32; out Res: Int32): TLPMResult;
 begin
-	L := L - Ord('1');
+	L := L - Ord('0');
 	if (L < 0) or (L >= Level) or (Captures[L].Length = LPM_CAP_UNFINISHED) then begin
 		{#! Add exception info about index }
 		Result := LPM_RESULT_INVALID_CAPTURE_INDEX;
