@@ -572,9 +572,10 @@ begin
 				end;
 			'$':
 				begin
-					if (p[1] = PEnd) then begin
+					if ((P + 1) = PEnd) then begin
 						if not (S = SrcEnd) then
 							S := nil;
+                        Break;
 					end
 					else begin
 						{ It will end case and go to default }
