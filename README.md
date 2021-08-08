@@ -5,7 +5,7 @@
 # LPatternMatch
 Pattern match engine adapted to Object Pascal from Lua 5.3 source code 
 
-Name LPatternMatch means Lua Pattern Match, which is what it really is - translated and adapted C code from Lua 5.3 [lstrlib.c](https://www.lua.org/source/5.1/lstrlib.c.html)
+Name LPatternMatch means Lua Pattern Match, which is what it really is - translated and adapted C code from Lua 5.3 [lstrlib.c](https://www.lua.org/source/5.3/lstrlib.c.html)
 
 # Why use (and why don't use) *this* instead of regex engines
 
