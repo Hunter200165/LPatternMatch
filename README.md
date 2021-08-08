@@ -165,7 +165,7 @@ Official website: [Lua](https://www.lua.org)
 
 Logo of language (I could not remember how to place images into mardown): [Logo](http://www.andreas-rozek.de/Lua/Lua-Logo_64x64.png "Lua logo")
 
-# Contancts
+# Contacts
 
 If you find a bug - please consider opening issue on github.
 
