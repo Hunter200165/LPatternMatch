@@ -141,7 +141,7 @@ Lua is great scripting programming language I have been used for years, and when
 
 Official website: [Lua](https://www.lua.org)
 
-Logo of language (I could not remember how to place images into mardown): [Logo](http://www.andreas-rozek.de/Lua/Lua-Logo_64x64.png "Lua logo")
+Logo of language: ![Logo](http://www.andreas-rozek.de/Lua/Lua-Logo_64x64.png "Lua logo")
 
 # Contacts
 
