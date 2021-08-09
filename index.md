@@ -89,7 +89,7 @@ LPatternMatch can also be compiled using Lazarus (if you do not have compiler in
 
 P.S. Always check project's wiki to see code examples - presented here code snipped might not be updated for long time (and so now it is already out of date)
 
-```pas
+```pascal
 
 uses
     HPatternMatch.Core;
