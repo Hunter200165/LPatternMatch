@@ -1,7 +1,13 @@
+<h1 align="center"> 
+  <img src="https://github.com/Hunter200165/LPatternMatch/blob/main/lpm-logo.png?raw=true" alt="drawing" height="100"/> 
+</h1>
+
 # LPatternMatch
 Pattern match engine adapted to Object Pascal from Lua 5.3 source code 
 
-Name LPatternMatch means Lua Pattern Match, which is what it really is - translated and adapted C code from Lua 5.3 [lstrlib.c](https://www.lua.org/source/5.1/lstrlib.c.html)
+Name LPatternMatch means Lua Pattern Match, which is what it really is - translated and adapted C code from Lua 5.3 [lstrlib.c](https://www.lua.org/source/5.3/lstrlib.c.html)
+
+To see detailed information about project internals - consider visiting [project wiki](https://github.com/Hunter200165/LPatternMatch/wiki)
 
 # Why use (and why don't use) *this* instead of regex engines
 
@@ -62,6 +68,7 @@ There are also special character classes, which may be used to make patterns sho
 - `%w` matches alphanumeric character (any letter or digit or underscope (`_`))
 - `%x` matches hexadecimal digit (0123456789abcdefABCDEF)
 - `%z` matches null character (0)
+
 Special character class may be inverted by placing uppercase letter instead of lowercase (for example, `%D` will match anything but digit).
 
 And also there are suffixes:
@@ -69,6 +76,7 @@ And also there are suffixes:
 - `*` matches 0 or more repetitions of given class (greedy)
 - `-` matches 0 or more repetitions of given class (non-greedy)
 - `?` matches either 0 or 1 repetitions of given class
+
 So for example `%d+` will try to match as many digits as possible but at least one.
 
 # How to compile LPatternMatch on FPC
@@ -79,59 +87,37 @@ LPatternMatch can also be compiled using Lazarus (if you do not have compiler in
 
 # Brief docs on how to use
 
-```pascal
-uses 
-  LPatternMatch.Core;
-  
+P.S. Always check project's wiki to see code examples - presented here code snipped might not be updated for long time (and so now it is already out of date)
+
+```pas
+
+uses
+    HPatternMatch.Core;
+
 var LPM: TLPMMatchState;
     A, B: UnicodeString;
-    Res: PLPMChar;
-    Status: TLPMResult;
-    i, k: Integer;
-begin
-  { Construct source and pattern strings }
-  A := 'hello world';
-  B := 'hello%s+(%w+)';
-  
-  { Call .Find method with parameters 
-      SourceStr: PLPMChar - pointer to source string
-      PatternStr: PLPMChar - pointer to pattern string
-      SourceStrLength: Int32 - length of source string
-      PatternStrLength: Int32 - length of patterns string
-      PosToStart: Int32 - position to start from (0-based!!!)
-      out Res: PLPMChar - output start of pattern (if matched any) or nil
-    Method returns TLPMResult (Int32), which signals if there were errors during pattern matching (invalid syntax etc)
-    If Result = 0 - there were no errors
-  }
-  Status := LPM.Find(@A[1], @B[1], Length(A), Length(B), 0, Res);
-  
-  { Check that there were no errors (Status = 0) }
-  if LongBool(Status) then begin
-    WriteLn('Finished with error status = ', Status);
-  end	
-  else begin
-    { If pattern is found in input string - there always will be at least one capture (0th) which will contain whole match (like you had placed `( )` around all expression) }
-    if LPM.Level <= 0 then
-      { So if there are no captures - pattern was not found }
-      WriteLn('Not found')
-    else begin
-      { So there we may output all the needed data. 
-        Capture record contains these fields:
-          Init: PLPMChar - start of the capture
-          Length: Int32 - length of the capture in chars
-        So if you need the position instead of pointer - you want to use pointer arithmetics (to subtract pointer to source string from Init)
-      }
-      for i := 0 to LPM.Level - 1 do begin
-        WriteLn('Capture #', i, ': ');
-        WriteLn('	Starts : ', LPM.Captures[i].Init - PLPMChar(@A[1]));
-        WriteLn('	Length : ', LPM.Captures[i].Length);
-        Write('	Content: ');
-        for k := 0 to LPM.Captures[i].Length - 1 do
-          Write(LPM.Captures[i].Init[k]);
-        WriteLn;
-      end;
-    end;
-  end;
+    Res: TLPMResult;
+    i: Integer;
+begin 
+    { Define A and B, Source string and pattern string }
+    A := 'hello world, hell no, hello my peaceful world';
+    B := '(hello.-)%p.-(hello.+)';
+    { Find string (or don't) }
+    Res := LPM.Find(A, B, 1);
+    { Check if there was an error 
+        Basically it is the same as: if not (Res = 0) then
+    }
+    if LongBool(Res) then 
+        WriteLn('There was an error matching string : ', Res)
+    { Check if there is a match }
+    else if LPM.Level = 0 then 
+        WriteLn('No match found')
+    else 
+        for i := 0 to LPM.Level - 1 do begin 
+            { Do whatever you want with results of matching. It is *that* simple }
+            WriteLn('Capture[', i, ']: Pos = ', LPM.Capture[i].Position, '; Length = ', LPM.Capture[i].Length, '; Content = ', LPM.GetCaptureContent(i));
+        end;
+    { No need to free the instance, as it is record type }
 end.
 ```
 
@@ -157,8 +143,11 @@ Official website: [Lua](https://www.lua.org)
 
 Logo of language: ![Logo](http://www.andreas-rozek.de/Lua/Lua-Logo_64x64.png "Lua logo")
 
-# Contancts
+# Contacts
 
 If you find a bug - please consider opening issue on github.
 
-If you want to contact me - you may use email (hunter200165@gmail.com), or discord (HFSoftware server, link is in my profile)  
+If you have a question - you may also open a discussion on github (it is lighter version of issues, so you can just ask your questions here) in real time, as chat.
+
+If you want to contact me - you may use email (hunter200165@gmail.com), or discord (HFSoftware server, link is in my profile)
+
