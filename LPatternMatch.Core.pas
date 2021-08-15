@@ -46,7 +46,7 @@ interface
 type
 {$IfDef Unicode}
 	TLPMString = UnicodeString;
-	TLPMChar = UnicodeChar;
+	TLPMChar = {$IfDef FPC}UnicodeChar{$Else}WideChar{$EndIf};
 {$Else}
 	TLPMString = AnsiString;
 	TLPMChar = Char;
@@ -184,7 +184,59 @@ implementation
 
 {$IfNDef UseStaticRanges}
 uses
-	Character;
+	{$IfNDef FPC}
+	System.Character
+	{$Else}
+	Character
+	{$EndIf};
+{$EndIf}
+
+{$IfNDef FPC}
+
+{ Delphi does not have such function - define it }
+function CompareByte(const A, B; const Size: Int32): Int32;
+var Ab, Bb: PByte;
+	Ai, Bi: PUInt32;
+	byA, byB: Byte;
+	iA, iB: UInt32;
+	i: Integer;
+begin 
+	Ai := @A;
+	Bi := @B;
+	Result := 0;
+    WriteLn(Size);
+	for i := 1 to Size div SizeOf(UInt32) do begin
+		iA := Ai^;
+		iB := Bi^;
+		if iA > iB then begin 
+			Result := 1;
+			Exit;
+		end
+		else if iA < iB then begin 
+			Result := -1;
+			Exit;
+		end;
+		Inc(Ai);
+		Inc(Bi);
+	end;
+	
+	Ab := PByte(Ai);
+	Bb := PByte(Bi);
+	for i := 1 to Size mod 4 do begin
+		byA := Ab^;
+		byB := Bb^;
+		if byA > byB then begin 
+			Result := 1;
+			Exit;
+		end
+		else if byA < byB then begin 
+			Result := -1;
+			Exit;
+		end;
+		Inc(Ab);
+		Inc(Bb);
+	end;
+end;
 {$EndIf}
 
 { TLPMMatchState }
@@ -227,7 +279,7 @@ begin
 		if Init = nil then
 			Break;
 		Init := Init + 1;
-		if CompareByte(Init^, S2[1], L2 * SizeOf(TLPMChar)) = 0 then begin
+		if CompareByte(Init^, S2[1], L2 * Int32(SizeOf(TLPMChar))) = 0 then begin
 			Result := Init - 1;
 			Exit;
 		end
@@ -337,16 +389,16 @@ function TLPMMatchState.MatchClass(C, CL: TLPMChar): Boolean;
 begin
 	{$IfNDef UseStaticRanges}
 	case CL of
-		'a', 'A': Result := (CL = 'A') xor IsLetter(UnicodeChar(C));
-		'c', 'C': Result := (CL = 'C') xor IsControl(UnicodeChar(C));
-		'd', 'D': Result := (CL = 'D') xor IsDigit(UnicodeChar(C));
-		'g', 'G': Result := (CL = 'G') xor not IsWhiteSpace(UnicodeChar(C));
-		'l', 'L': Result := (CL = 'L') xor IsLower(UnicodeChar(C));
-		'p', 'P': Result := (CL = 'P') xor IsPunctuation(UnicodeChar(C));
-		's', 'S': Result := (CL = 'S') xor IsWhiteSpace(UnicodeChar(C));
-		'u', 'U': Result := (CL = 'U') xor IsUpper(UnicodeChar(C));
-		'w', 'W': Result := (CL = 'W') xor IsLetterOrDigit(UnicodeChar(C));
-		'x', 'X': Result := (CL = 'X') xor (C in ['0'..'9', 'a'..'f', 'A'..'F']);
+		'a', 'A': Result := (CL = 'A') xor {$IfDef FPC}IsLetter(UnicodeChar(C))        {$Else}C.IsLetter{$EndIf};
+		'c', 'C': Result := (CL = 'C') xor {$IfDef FPC}IsControl(UnicodeChar(C))       {$Else}C.IsControl{$EndIf};
+		'd', 'D': Result := (CL = 'D') xor {$IfDef FPC}IsDigit(UnicodeChar(C))         {$Else}C.IsDigit{$EndIf};
+		'g', 'G': Result := (CL = 'G') xor not {$IfDef FPC}IsWhiteSpace(UnicodeChar(C)){$Else}C.IsWhiteSpace{$EndIf};
+		'l', 'L': Result := (CL = 'L') xor {$IfDef FPC}IsLower(UnicodeChar(C))         {$Else}C.IsLower{$EndIf};
+		'p', 'P': Result := (CL = 'P') xor {$IfDef FPC}IsPunctuation(UnicodeChar(C))   {$Else}C.IsPunctuation{$EndIf};
+		's', 'S': Result := (CL = 'S') xor {$IfDef FPC}IsWhiteSpace(UnicodeChar(C))    {$Else}C.IsWhiteSpace{$EndIf};
+		'u', 'U': Result := (CL = 'U') xor {$IfDef FPC}IsUpper(UnicodeChar(C))         {$Else}C.IsUpper{$EndIf};
+		'w', 'W': Result := (CL = 'W') xor {$IfDef FPC}IsLetterOrDigit(UnicodeChar(C)) {$Else}C.IsLetterOrDigit{$EndIf};
+		'x', 'X': Result := (CL = 'X') xor (((C >= '0') and (C <= '9')) or ((C >= 'a') and (C <= 'f')) or ((C >= 'A') and (C <= 'F')));
 		'z', 'Z': Result := (CL = 'Z') xor (C = #0);
 	else
 		Result := CL = C;
@@ -411,7 +463,7 @@ begin
 	if LongBool(Result) then
 		Exit;
 	Len := Captures[L].Length;
-	if ((SrcEnd - S) >= Len) and (CompareChar(Captures[L].Init^, S^, Len * SizeOf(TLPMChar)) = 0) then
+	if ((SrcEnd - S) >= Len) and (CompareByte(Captures[L].Init^, S^, Len * SizeOf(TLPMChar)) = 0) then
 		Res := S + Len
 	else
 		Res := nil;

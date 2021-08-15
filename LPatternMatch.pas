@@ -1,6 +1,10 @@
 program LPatternMatch;
 
-{$Mode ObjFPC}
+{$IfDef FPC}
+	{$Mode ObjFPC}
+{$Else}
+	{$Apptype Console}
+{$EndIf}
 {$PointerMath On}
 
 uses LPatternMatch.Core;
