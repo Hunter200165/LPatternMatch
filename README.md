@@ -40,8 +40,10 @@ If you do not need Unicode support - just comment out the directive `{$Define UN
 
 # Delphi compatibility
 
-Well, I do not know if it is going to work with Delphi, as I really tested it only on FPC (version 3.3.1-r49634 \[2021/08/06\] for x86_64). Also I do not have Delphi compiler right now to test it out. If you are interested in this or want to help with this - you may test it out and mail me.
-Code looks like normal Object Pascal source without any dependence on Delphi/FPC side, so it should work normally, I guess.
+~~Well, I do not know if it is going to work with Delphi, as I really tested it only on FPC (version 3.3.1-r49634 \[2021/08/06\] for x86_64). Also I do not have Delphi compiler right now to test it out. If you are interested in this or want to help with this - you may test it out and mail me.
+Code looks like normal Object Pascal source without any dependence on Delphi/FPC side, so it should work normally, I guess.~~
+
+Finally got compiler on my machine so could test it out and fix incompatibilies; Now unit should work the same on fpc and delphi.
 
 # Pattern syntax
 
@@ -84,6 +86,12 @@ So for example `%d+` will try to match as many digits as possible but at least o
 You may just use `ppcx64 LPatternMatch.pas` (replace `ppcx64` with any other name of compiler on other platforms) if it is in your PATH (on windows).
 
 LPatternMatch can also be compiled using Lazarus (if you do not have compiler in your path or just do not prefer using cmd compilation).
+
+# How to compile LPatternMatch on Delphi
+
+You may just use `dcc64 LPatternMatch.pas` (replace `dcc64` with any other name of compiler on your platform/arch) if it is in your PATH (should be if you installed RAD Studio).
+
+LPatternMatch can also be compiled using RAD Studio.
 
 # Brief docs on how to use
 
