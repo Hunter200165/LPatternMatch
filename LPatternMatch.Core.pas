@@ -204,7 +204,6 @@ begin
 	Ai := @A;
 	Bi := @B;
 	Result := 0;
-    WriteLn(Size);
 	for i := 1 to Size div SizeOf(UInt32) do begin
 		iA := Ai^;
 		iB := Bi^;
