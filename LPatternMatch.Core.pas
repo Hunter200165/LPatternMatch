@@ -396,7 +396,7 @@ begin
 		'p', 'P': Result := (CL = 'P') xor {$IfDef FPC}IsPunctuation(UnicodeChar(C))   {$Else}C.IsPunctuation{$EndIf};
 		's', 'S': Result := (CL = 'S') xor {$IfDef FPC}IsWhiteSpace(UnicodeChar(C))    {$Else}C.IsWhiteSpace{$EndIf};
 		'u', 'U': Result := (CL = 'U') xor {$IfDef FPC}IsUpper(UnicodeChar(C))         {$Else}C.IsUpper{$EndIf};
-		'w', 'W': Result := (CL = 'W') xor {$IfDef FPC}IsLetterOrDigit(UnicodeChar(C)) {$Else}C.IsLetterOrDigit{$EndIf};
+		'w', 'W': Result := (CL = 'W') xor ({$IfDef FPC}IsLetterOrDigit(UnicodeChar(C)) {$Else}C.IsLetterOrDigit{$EndIf} or (C = '_'));
 		'x', 'X': Result := (CL = 'X') xor (((C >= '0') and (C <= '9')) or ((C >= 'a') and (C <= 'f')) or ((C >= 'A') and (C <= 'F')));
 		'z', 'Z': Result := (CL = 'Z') xor (C = #0);
 	else
@@ -412,7 +412,7 @@ begin
 		'p', 'P': Result := (CL = 'P') xor (((C >= '!') and (C < '0')) or ((C > '9') and (C < 'A')) or ((C > 'Z') and (C < 'a')) or ((C > 'z') and (C < #128)));
 		's', 'S': Result := (CL = 'S') xor (C <= ' ');
 		'u', 'U': Result := (CL = 'U') xor ((C >= 'A') and (C <= 'Z'));
-		'w', 'W': Result := (CL = 'W') xor ((C in ['0'..'9']) or (((C >= 'a') and (C <= 'z')) or ((C >= 'A') and (C <= 'Z'))));
+		'w', 'W': Result := (CL = 'W') xor ((C in ['0'..'9']) or (C = '_') or (((C >= 'a') and (C <= 'z')) or ((C >= 'A') and (C <= 'Z'))));
 		'x', 'X': Result := (CL = 'X') xor (C in ['0'..'9', 'a'..'f', 'A'..'F']);
 		'z', 'Z': Result := (CL = 'Z') xor (C = #0);
 	else
